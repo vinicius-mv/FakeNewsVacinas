@@ -20,11 +20,6 @@ def create_dataframe_from_tweet_list(tweet_list: list) -> pd.DataFrame:
     return tweets_df
 
 
-# 100k - vacina
-# 10k - vachina
-# 10k - vacina china
-# 10k - vacina chinesa
-# 10k - vacina morte
 key_words = "vacina sem eficácia"
 # Using TwitterSearchScraper to scrape data and append tweets to list
 for i, tweet in enumerate(sntwitter.TwitterSearchScraper(f"{key_words} since:2021-01-01 until:2021-05-31").get_items()):
