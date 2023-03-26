@@ -20,9 +20,6 @@ absolute_path = os.path.dirname(__file__)
 
 data = pd.read_csv(absolute_path + "\\vacinas-dataset.csv")
 
-# shuffle data
-data = data.sample(frac=1)
-
 #  filter out rows based on missing values in a column
 data = data[data.is_missinginfo.notnull()]
 
@@ -120,10 +117,9 @@ df1.groupby('Review').sum()['count'].sort_values(ascending=False).plot(
 )
 
 # Converting text into Vectors
-
 # Before converting the data into vectors, split it into train and test.
 x_train, x_test, y_train, y_test = train_test_split(
-    df['content'], df['is_missinginfo'], test_size=0.25)
+    data['content'], data['is_missinginfo'], test_size=0.25)
 
 # convert the training data into vectors
 vectorization = TfidfVectorizer()
