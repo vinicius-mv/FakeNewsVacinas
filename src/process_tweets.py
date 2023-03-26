@@ -1,3 +1,4 @@
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
@@ -17,16 +18,17 @@ import os
 
 absolute_path = os.path.dirname(__file__)
 
-data = pd.read_csv(absolute_path + "\\temp\\vacina sem comprovação-tweets.csv")
-# tweets.set_index('id', inplace=True)
+data = pd.read_csv(absolute_path + "\\vacinas-dataset.csv")
 
-data.head()
-data.shape
-
-data.isnull().sum()
+# shuffle data
+data = data.sample(frac=1)
 
 #  filter out rows based on missing values in a column
 data = data[data.is_missinginfo.notnull()]
+
+# filter out rows with inconclusive information
+data = data[data['is_missinginfo'] >= 0]
+data.shape
 
 data.head()
 
@@ -90,7 +92,7 @@ for word in data['content'][data['is_missinginfo'] == 1]:
 fake_consolidated = ' '.join(fake_words)
 plot_word_cloud(fake_consolidated)
 
-# bargraph
+# Top words bargraph
 
 
 def get_top_n_words(corpus, n=None):
@@ -118,26 +120,32 @@ df1.groupby('Review').sum()['count'].sort_values(ascending=False).plot(
 )
 
 # Converting text into Vectors
-# filtering data set
-df = data[data['is_missinginfo'] != None]
-df.head()
+
 # Before converting the data into vectors, split it into train and test.
 x_train, x_test, y_train, y_test = train_test_split(
     df['content'], df['is_missinginfo'], test_size=0.25)
 
 # convert the training data into vectors
-
 vectorization = TfidfVectorizer()
 x_train = vectorization.fit_transform(x_train)
 x_test = vectorization.transform(x_test)
 
 # Model training, Evaluation, and Prediction
-# For training we will use Logistic Regression and evaluate the prediction accuracy using accuracy_score.
-from sklearn.linear_model import LogisticRegression
-  
+
+# Classifier: Logistic Regression
 model = LogisticRegression()
 model.fit(x_train, y_train)
-  
-# testing the model LogisticRegression
-print(accuracy_score(y_train, model.predict(x_train)))
-print(accuracy_score(y_test, model.predict(x_test)))
+log_reg_accuracy_train = accuracy_score(y_train, model.predict(x_train))
+print("LogisticRegression train accuracy: " + str(log_reg_accuracy_train))
+log_reg_accuracy_test = accuracy_score(y_test, model.predict(x_test))
+print("LogisticRegression test accuracy: " + str(log_reg_accuracy_test))
+
+# Classifier: Decision Tree
+model = DecisionTreeClassifier()
+model.fit(x_train, y_train)
+decision_tree_accuracy_train = accuracy_score(y_train, model.predict(x_train))
+print("DecisionTreeClassifier train accuracy: " +
+      str(decision_tree_accuracy_train))
+decision_tree_accuracy_test = accuracy_score(y_test, model.predict(x_test))
+print("DecisionTreeClassifier test accuracy: " +
+      str(decision_tree_accuracy_test))
