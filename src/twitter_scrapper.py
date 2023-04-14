@@ -35,7 +35,7 @@ for i, tweet in enumerate(sntwitter.TwitterSearchScraper(f"{key_words} since:202
         temp_df = create_dataframe_from_tweet_list(temp_tweets_list)
         temp_tweets_list = []
         write_header = False
-        if(i == 0):  # write header the first time
+        if (i == 0):  # write header the first time
             write_header = True
         temp_df.to_csv(absolute_path + f'\\temp\\{key_words}-tweets.csv',
                        mode='a', index=True, header=write_header)

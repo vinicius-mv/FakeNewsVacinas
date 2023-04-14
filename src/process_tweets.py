@@ -18,7 +18,7 @@ import os
 
 absolute_path = os.path.dirname(__file__)
 
-data = pd.read_csv(absolute_path + "\\vacinas-dataset.csv")
+data = pd.read_csv(absolute_path + "\\datasets\\vacinas-dataset.csv")
 
 #  filter out rows based on missing values in a column
 data = data[data.is_missinginfo.notnull()]
@@ -79,6 +79,7 @@ for word in data['content'][data['is_missinginfo'] == 0]:
     real_words.append(word)
 
 real_consolidated = ' '.join(real_words)
+print("Word Cloud Real Tweets")
 plot_word_cloud(real_consolidated)
 
 # Fake wordcloud
@@ -87,11 +88,10 @@ for word in data['content'][data['is_missinginfo'] == 1]:
     fake_words.append(word)
 
 fake_consolidated = ' '.join(fake_words)
+print("Word Cloud Fake Tweets")
 plot_word_cloud(fake_consolidated)
 
 # Top words bargraph
-
-
 def get_top_n_words(corpus, n=None):
     vec = CountVectorizer().fit(corpus)
     bag_of_words = vec.transform(corpus)
@@ -104,7 +104,7 @@ def get_top_n_words(corpus, n=None):
     words_freq = sorted(words_freq, key=lambda x: x[1], reverse=True)
     return words_freq[: n]
 
-
+print("Top Words")
 common_words = get_top_n_words(data['content'], 20)
 df1 = pd.DataFrame(common_words, columns=['Review', 'count'])
 
