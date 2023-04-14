@@ -21,11 +21,12 @@ for index, row in df.iterrows():
     print()
 
     print("Important notes:")
-    print("* A Anvisa concedeu em 17/01/2021 o registro emergencial da vacina CoronaVac contra a Covid-19")
-    print("* A Anvisa concedeu em 23/02/2021 o registro definitivo à vacina contra a covid-19 Pfizer / BioNtech")
-    print("* A Anvisa concedeu em 12/03/2021 o registro da vacina da Fiocruz/AstraZeneca\n")
+    print("* A Anvisa concedeu em 2021-01-17 o registro emergencial da vacina CoronaVac")
+    print("* A Anvisa concedeu em 2021-01-17 o registro emergencial da vacina Fiocruz/AstraZeneca")
+    print("* A OMS concedeu em 2020-12-31 a autorização emergêncial da vacina Pfizer BioNTech")
+    print("* A Anvisa concedeu em 2021-02-23 o registro definitivo da vacina Pfizer / BioNtech")
     response = input(
-        "\rIs it fake news about covid vacines?\n1 -> yes\n0 -> no\n-1 -> not sure / not related\n * - skip\ne -> exit\nR: ")
+        "Is it fake news about covid vacines?\n1 -> yes\n0 -> no\n-1 -> not sure / not related\n * - skip\ne -> exit and save\nR: ")
     response = response.lower()
     print("\n")
     if (response == "1"):
