@@ -18,7 +18,12 @@ for index, row in df.iterrows():
     print(f"Date: '{row.date}'")
     print(f"User: '{row.user_displayname}'")
     print(f"Content: '{row.content}'")
-    print("\n\n")
+    print()
+
+    print("Important notes:")
+    print("* A Anvisa concedeu em 17/01/2021 o registro emergencial da vacina CoronaVac contra a Covid-19")
+    print("* A Anvisa concedeu em 23/02/2021 o registro definitivo à vacina contra a covid-19 Pfizer / BioNtech")
+    print("* A Anvisa concedeu em 12/03/2021 o registro da vacina da Fiocruz/AstraZeneca\n")
     response = input(
         "\rIs it fake news about covid vacines?\n1 -> yes\n0 -> no\n-1 -> not sure / not related\n * - skip\ne -> exit\nR: ")
     response = response.lower()
@@ -31,10 +36,6 @@ for index, row in df.iterrows():
         df.at[index, 'is_missinginfo'] = -1  # not sure / not related
     elif (response == "e"):  # exit
         break
-
-# A vacina concedeu em 17/01/2021 o registro emergencial da vacina CoronaVac contra a Covid-19
-# A Anvisa concedeu em 23/02/2021 o registro definitivo à vacina contra a covid-19 Pfizer / BioNtech
-# A Anvisa concedeu em 12/03/2021 o registro da vacina da Fiocruz/AstraZeneca
 
 df.head()
 
