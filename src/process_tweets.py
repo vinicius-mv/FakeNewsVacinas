@@ -12,11 +12,12 @@ import nltk
 import re
 from tqdm import tqdm
 import pandas as pd
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-import os
+from utils import get_absolute_path
 
-absolute_path = os.path.dirname(__file__)
+absolute_path = get_absolute_path()
 
 data = pd.read_csv(absolute_path + "\\datasets\\vacinas-dataset.csv")
 
@@ -46,15 +47,15 @@ nltk.download('stopwords')
 
 
 def preprocess_text(text_data):
-    preprocess_text = []
-
+    treated_text = []
     for setence in tqdm(text_data):
+        # setence = re.sub(r'\?+', '\?', setence)
+        # setence = re.sub(r'[^\w\s"?]', '', setence)
         setence = re.sub(r'[^\w\s]', '', setence)
-        preprocess_text.append(' '.join(token.lower()
-                                        for token in str(setence).split()
-                                        if token not in stopwords.words('portuguese')))
-
-    return preprocess_text
+        treated_text.append(' '.join(token.lower()
+                                     for token in str(setence).split()
+                                     if token not in stopwords.words('portuguese')))
+    return treated_text
 
 
 preprocecessed_review = preprocess_text(data['content'].values)
@@ -92,6 +93,8 @@ print("Word Cloud Fake Tweets")
 plot_word_cloud(fake_consolidated)
 
 # Top words bargraph
+
+
 def get_top_n_words(corpus, n=None):
     vec = CountVectorizer().fit(corpus)
     bag_of_words = vec.transform(corpus)
@@ -103,6 +106,7 @@ def get_top_n_words(corpus, n=None):
 
     words_freq = sorted(words_freq, key=lambda x: x[1], reverse=True)
     return words_freq[: n]
+
 
 print("Top Words")
 common_words = get_top_n_words(data['content'], 20)
@@ -118,30 +122,67 @@ df1.groupby('Review').sum()['count'].sort_values(ascending=False).plot(
 
 # Converting text into Vectors
 # Before converting the data into vectors, split it into train and test.
+
 x_train, x_test, y_train, y_test = train_test_split(
     data['content'], data['is_missinginfo'], test_size=0.25)
 
+for content in x_train:
+    print(content)
 # convert the training data into vectors
-vectorization = TfidfVectorizer()
+vectorization = TfidfVectorizer(strip_accents='ascii', ngram_range=(1, 4))
 x_train = vectorization.fit_transform(x_train)
 x_test = vectorization.transform(x_test)
 
 # Model training, Evaluation, and Prediction
 
 # Classifier: Logistic Regression
-model = LogisticRegression()
-model.fit(x_train, y_train)
-log_reg_accuracy_train = accuracy_score(y_train, model.predict(x_train))
+log_reg_model = LogisticRegression()
+log_reg_model.fit(x_train, y_train)
+log_reg_accuracy_train = accuracy_score(
+    y_train, log_reg_model.predict(x_train))
 print("LogisticRegression train accuracy: " + str(log_reg_accuracy_train))
-log_reg_accuracy_test = accuracy_score(y_test, model.predict(x_test))
+log_reg_accuracy_test = accuracy_score(y_test, log_reg_model.predict(x_test))
 print("LogisticRegression test accuracy: " + str(log_reg_accuracy_test))
 
 # Classifier: Decision Tree
-model = DecisionTreeClassifier()
-model.fit(x_train, y_train)
-decision_tree_accuracy_train = accuracy_score(y_train, model.predict(x_train))
+dec_tree_model = DecisionTreeClassifier()
+dec_tree_model.fit(x_train, y_train)
+decision_tree_accuracy_train = accuracy_score(
+    y_train, dec_tree_model.predict(x_train))
 print("DecisionTreeClassifier train accuracy: " +
       str(decision_tree_accuracy_train))
-decision_tree_accuracy_test = accuracy_score(y_test, model.predict(x_test))
+decision_tree_accuracy_test = accuracy_score(
+    y_test, dec_tree_model.predict(x_test))
 print("DecisionTreeClassifier test accuracy: " +
       str(decision_tree_accuracy_test))
+
+
+def log_reg_predict(text: str):
+    print("\n\nPredicting:\n")
+    text = preprocess_text([text])
+    print(text[0])
+    x_new = vectorization.transform(text)
+    y_new = log_reg_model.predict_proba(x_new)
+    # print("X=%s, Predicted reg log=%s" % (x_new[0], y_new_log[0]))
+    # y_new_log[0][0] --> chance to be 0 (is_missing_info = false)
+    # y_new_log[0][1]  --> chance to be 1 (is_missing_info = true)
+    print("Log Reg predicted true prob=%s" % (y_new[0][0]))
+    print("Log Reg predicted fake prob=%s" % (y_new[0][1]))
+    y_new_final = log_reg_model.predict(x_new)
+    print(f"Predicted reg log = {y_new_final[0]}")
+    return
+
+
+def dec_tree_predict(text: str):
+    print("\n\nPredicting:\n")
+    text = preprocess_text([text])
+    print(text[0])
+    x_new = vectorization.transform(text)
+    y_new = dec_tree_model.predict_proba(x_new)
+    # y_new[0][0]  --> chance to be 0 (is_missing_info = false)
+    # y_new_log[0][1]  --> chance to be 1 (is_missing_info = true)
+    print("Dec Tree predicted true prob=%s" % (y_new[0][0]))
+    print("Dec Tree predicted fake prob=%s" % (y_new[0][1]))
+    y_new_final = dec_tree_model.predict(x_new)
+    print(f"Predicted reg log = {y_new_final[0]}")
+    return

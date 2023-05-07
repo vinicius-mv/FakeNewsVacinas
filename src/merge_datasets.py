@@ -1,7 +1,7 @@
 import pandas as pd
-import os
+from utils import get_absolute_path
 
-absolute_path = os.path.dirname(__file__)
+absolute_path = get_absolute_path()
 
 # files already merged vacina sem eficácia-tweets.csv', 'vacina sem comprovação-tweets.csv', 'vacina cobaia-tweets.csv
 files_to_read = []

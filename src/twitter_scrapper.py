@@ -1,9 +1,9 @@
 import snscrape.modules.twitter as sntwitter
 import pandas as pd
-import os
 
-absolute_path = os.path.dirname(__file__)
-absolute_path
+from utils import get_absolute_path
+
+absolute_path = get_absolute_path()
 
 # Using TwitterSearchScraper to scrape data and append tweets to list
 # Creating list to append tweet data
