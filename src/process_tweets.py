@@ -12,33 +12,25 @@ import nltk
 import re
 from tqdm import tqdm
 import pandas as pd
-import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from MongoConnector import MongoConnector
 from utils import get_absolute_path
 
 absolute_path = get_absolute_path()
 
-data = pd.read_csv(absolute_path + "\\datasets\\vacinas-dataset.csv")
+# data = pd.read_csv(absolute_path + "\\datasets\\vacinas-dataset.csv")
 
-#  filter out rows based on missing values in a column
-data = data[data.is_missinginfo.notnull()]
+client = MongoConnector()
+client.initialize()
 
-# filter out rows with inconclusive information
-data = data[data["is_missinginfo"] >= 0]
-data.shape
+collection = "tweets"
+query = {"is_missinginfo": {"$gt": -1}}
+cursor = client.find(collection, query)
 
-data.head()
+data = pd.DataFrame(cursor)
+data.set_index("_id", inplace=True)
 
-data = data.drop_duplicates(subset=["id"])
-data.shape
-
-# Shuffling
-data = data.sample(frac=1)
-data.reset_index(inplace=True)
-data.drop(["index"], axis=1, inplace=True)
-
-data.head()
 sns.countplot(
     data=data, x="is_missinginfo", order=data["is_missinginfo"].value_counts().index
 )
@@ -50,9 +42,9 @@ nltk.download("stopwords")
 def preprocess_text(text_data):
     treated_text = []
     for setence in tqdm(text_data):
-        # setence = re.sub(r'\?+', '\?', setence)
-        # setence = re.sub(r'[^\w\s"?]', '', setence)
-        setence = re.sub(r"[^\w\s]", "", setence)
+        setence = re.sub(r"\?+", "\?", setence)
+        setence = re.sub(r'[^\w\s"?]', "", setence)
+        # setence = re.sub(r"[^\w\s]", "", setence)
         treated_text.append(
             " ".join(
                 token.lower()
