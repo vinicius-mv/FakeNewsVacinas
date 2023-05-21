@@ -1,7 +1,7 @@
 import pandas as pd
 
-from MongoConnector import MongoConnector
-from utils import get_absolute_path
+from utils.MongoConnector import MongoConnector
+from utils.path import get_absolute_path
 
 absolute_path = get_absolute_path()
 

@@ -14,8 +14,8 @@ from tqdm import tqdm
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from MongoConnector import MongoConnector
-from utils import get_absolute_path
+from utils.MongoConnector import MongoConnector
+from utils.path import get_absolute_path
 
 absolute_path = get_absolute_path()
 
@@ -42,7 +42,7 @@ nltk.download("stopwords")
 def preprocess_text(text_data):
     treated_text = []
     for setence in tqdm(text_data):
-        setence = re.sub(r"\?+", "\?", setence)
+        setence = re.sub(r"\?+", "?", setence)
         setence = re.sub(r'[^\w\s"?]', "", setence)
         # setence = re.sub(r"[^\w\s]", "", setence)
         treated_text.append(

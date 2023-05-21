@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-from utils import get_absolute_path
+from utils.path import get_absolute_path
 
 absolute_path = get_absolute_path()
 

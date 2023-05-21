@@ -1,12 +1,7 @@
 import pandas as pd
 import numpy as np
-import os
 
 from MongoConnector import MongoConnector
-
-absolute_path = os.path.dirname(__file__)
-
-# df = pd.read_csv("datasets\\vacinas-dataset.csv", index_col="id")
 
 client = MongoConnector()
 client.initialize()
@@ -19,6 +14,7 @@ df = pd.DataFrame(cursor)
 df.head()
 df.set_index("_id", inplace=True)
 
+# randomize sample
 # data = df.sample(frac=1)
 
 updated_rows_df = pd.DataFrame()
@@ -56,7 +52,7 @@ for index, row in df.iterrows():
         "* A Anvisa concedeu em 2021-02-23 o registro definitivo da vacina Pfizer / BioNtech"
     )
     response = input(
-        "Is it fake news about covid vacines?\n1 -> yes\n0 -> no\n-1 -> not sure / not related\n * - skip\ne -> exit and save\nR: "
+        "Is it fake news about covid vacines?\n1 -> yes\n0 -> no\n-1 -> not sure / not related\n * - skip\ne -> exit\nR: "
     )
     response = response.lower()
     print("\n")
@@ -71,5 +67,7 @@ for index, row in df.iterrows():
         update_row(row)
     elif response == "e":  # exit
         break
+    
+client.close()
 
 print("DONE!")

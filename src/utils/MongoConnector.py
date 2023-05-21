@@ -1,16 +1,16 @@
-import config as cfg
 import pymongo
-
+import config as cfg
 
 class MongoConnector(object):
     URI = cfg.mongodb["uri"]
     PORT = cfg.mongodb["port"]
+    CLIENT = None
     DATABASE = None
-
+        
     @staticmethod
     def initialize():
-        client = pymongo.MongoClient(MongoConnector.URI)
-        MongoConnector.DATABASE = client["tcc"]
+        MongoConnector.CLIENT = pymongo.MongoClient(MongoConnector.URI)
+        MongoConnector.DATABASE = MongoConnector.CLIENT["tcc"]
 
     @staticmethod
     def insert(collection, data):
@@ -50,3 +50,8 @@ class MongoConnector(object):
             # Send a ping to confirm a successful connection
         except Exception as e:
             print(e)
+            
+    @staticmethod          
+    def close():
+        print("Connection closed")
+        MongoConnector.CLIENT.close()
