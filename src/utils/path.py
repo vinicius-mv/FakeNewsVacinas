@@ -1,4 +1,4 @@
 import os
 
-def get_absolute_path():
-    return os.path.dirname(__file__)
+def get_main_path():
+    return os.path.dirname("src/main.py")
