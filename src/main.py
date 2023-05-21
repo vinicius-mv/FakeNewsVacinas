@@ -43,4 +43,6 @@ x = model_log.predict([text1])
 y = model_dtree.predict([text1])
 z = model_nb.predict([text1])
 
+client.close()
+
 print("DONE!")

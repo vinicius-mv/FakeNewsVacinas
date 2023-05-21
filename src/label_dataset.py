@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from MongoConnector import MongoConnector
+from utils.MongoConnector import MongoConnector
 
 client = MongoConnector()
 client.initialize()
