@@ -1,7 +1,7 @@
 import re
-from abc import abstractmethod
-
 import nltk
+import numpy as np
+import pandas as pd
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
-
+nltk.download('omw-1.4')
 
 class PredictionModel(object):
     def __init__(self):
@@ -19,7 +19,8 @@ class PredictionModel(object):
         self.vectorizer = None
         self.fake_tweets_train = None
         self.total_tweets_train = None
-        self.model_accuracy = None
+        self.model_train_accuracy = None
+        self.model_test_accuracy = None
 
     # def preprocess_text(self, text_data):
     #     treated_text = []
@@ -55,15 +56,15 @@ class PredictionModel(object):
         return preprocessed_text
 
     @staticmethod
-    def __get_fake_tweets_length(y: list):
+    def get_fake_tweets_length(Y: list):
         total = 0
-        current_y: float
-        for current_y in y:
-            if current_y == 1:
-                total = total + 1
+        y: float
+        for y in Y:
+            if (float(y) == 1.0):
+                total = total + 1.0
         return total
 
-    def train(self, x: list, y: list, test_size=0.25):
+    def train(self, x, y, test_size=0.25):
         # Preprocess tweets
         x_preprocessed = [self.preprocess_text(tweet) for tweet in x]
 
@@ -72,23 +73,25 @@ class PredictionModel(object):
 
         # Set train size control fields
         self.total_tweets_train = len(x)
-        self.fake_tweets_train = self.__get_fake_tweets_length(y_train)
+        self.fake_tweets_train = self.get_fake_tweets_length(y_train)
 
         # Create TF-IDF vectorizer
         # self.vectorizer = TfidfVectorizer()
-        self.vectorizer = TfidfVectorizer(strip_accents="ascii", ngram_range=(1, 4))
+        self.vectorizer = TfidfVectorizer(strip_accents="ascii", ngram_range=(1, 2))
         x_tfidf = self.vectorizer.fit_transform(x_train)
-
+        
         # Train model
         self.model.fit(x_tfidf, y_train)
 
         # Calculate model accuracy
-        self.model_accuracy = self.model_score(x_test, y_test)
+        self.model_train_accuracy = self.model_score(x_train, y_train)
+        self.model_test_accuracy = self.model_score(x_test, y_test)
 
     def show_info(self):
         print('Model train - total tweets: ' + str(self.total_tweets_train))
         print('Model train - fake tweets: ' + str(self.fake_tweets_train))
-        print('Model Accuracy: ' + str(self.model_accuracy))
+        print('Model train - Accuracy: ' + str(self.model_train_accuracy))
+        print('Model test - Accuracy: ' + str(self.model_test_accuracy))
 
     def model_score(self, x, y):
         x_tfidf = self.vectorizer.transform(x)

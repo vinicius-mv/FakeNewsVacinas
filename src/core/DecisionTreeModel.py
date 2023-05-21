@@ -1,16 +1,13 @@
-import nltk
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
-
+from sklearn.tree import DecisionTreeClassifier
 from core.PredictionModel import PredictionModel
 
 
 # https://www.geeksforgeeks.org/fake-news-detection-using-machine-learning/
-# https://realpython.com/logistic-regression-python/
-class LogisticRegressionModel(PredictionModel):
+class DecisionTreeModel(PredictionModel):
     def __init__(self):
         super().__init__()
-        self.model = LogisticRegression()
+        self.model = DecisionTreeClassifier()
 
     @staticmethod
     def preprocess_text(text):
@@ -20,7 +17,7 @@ class LogisticRegressionModel(PredictionModel):
         super().train(x, y, test_size)
 
     def show_info(self):
-        print("Logistic Regression Model:")
+        print("Decision Tree Model:")
         super().show_info()
 
     def model_score(self, x, y):
