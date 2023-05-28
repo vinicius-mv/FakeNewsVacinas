@@ -1,12 +1,13 @@
 import re
 import nltk
-import numpy as np
-import pandas as pd
+import spacy
+
 from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
+
+spacy.cli.download("pt_core_news_sm")
+nlp = spacy.load("pt_core_news_sm")
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -14,6 +15,7 @@ nltk.download('wordnet')
 nltk.download('omw-1.4')
 
 class PredictionModel(object):
+    
     def __init__(self):
         self.model = None
         self.vectorizer = None
@@ -21,38 +23,30 @@ class PredictionModel(object):
         self.total_tweets_train = None
         self.model_train_accuracy = None
         self.model_test_accuracy = None
-
-    # def preprocess_text(self, text_data):
-    #     treated_text = []
-    #     for setence in tqdm(text_data):
-    #         setence = re.sub(r"\?+", "\?", setence)
-    #         setence = re.sub(r'[^\w\s"?]', "", setence)
-    #         # setence = re.sub(r"[^\w\s]", "", setence)
-    #         treated_text.append(
-    #             " ".join(
-    #                 token.lower()
-    #                 for token in str(setence).split()
-    #                 if token not in stopwords.words("portuguese")
-    #             )
-    #         )
-    #     return treated_text
-
+        
     @staticmethod
     def preprocess_text(text):
-        # Remove multiples questions marks
+        # Remove multiples questions mark
         text = re.sub(r"\?+", "?", text)
+        
+        # Filter symbols, punctuation, etc.
+        text = re.sub(r"[^\w\s?\"]", "", text)
+        
+        # Convert abreviations
+        text = re.sub(r"\sq\s", " que ", text)
+        text = re.sub(r"\svc\s", " você ", text)
 
-        # Tokenize text
-        tokens = word_tokenize(text, language='portuguese')
-
-        # Remove stopwords
+        # Lemmatize tokens and remove stopwords 
         stop_words = set(stopwords.words('portuguese'))
-        filtered_tokens = [token for token in tokens if token.lower() not in stop_words]
-
-        # Lemmatize tokens
-        lemmatizer = WordNetLemmatizer()
-        preprocessed_text = ' '.join([lemmatizer.lemmatize(token) for token in filtered_tokens])
-
+        doc = nlp(text)
+        tokens  = [ token.lemma_ for token in doc if token.text not in stop_words ]
+        
+        # create a string from tokens
+        preprocessed_text = ' '.join(tokens)
+        
+        # remove multiple whitespaces
+        preprocessed_text = re.sub("\s+", " ", preprocessed_text)
+        
         return preprocessed_text
 
     @staticmethod
