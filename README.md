@@ -6,10 +6,6 @@
 
 2.  Iniciar o AnacondaPrompt e navegar até a pasta raiz do repositório.
 
-3. Instalar o environment do repositório, na pasta raiz do projeto digite: conda env create -f nlp_tweets_environment.yml
+3. Instalar os requirements do repositório, na pasta raiz do projeto, onde se encotra o arquivo 'requirements.txt',  digite: pip install -r requirements.txt
 
-3. Ativar o enviroment: conda activate nlp_tweets
-
-4. rode os scripts python dentro deste prompt com o ambiente ativado!!
-
-
+4. Rode os scripts python dentro do Anaconda Prompt, certificando de rodar no mesmo ambiente onde foi instalado os requirements!!
