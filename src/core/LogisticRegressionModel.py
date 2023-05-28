@@ -16,8 +16,8 @@ class LogisticRegressionModel(PredictionModel):
     def preprocess_text(text):
         return PredictionModel.preprocess_text(text)
 
-    def train(self, x, y, test_size=0.25):
-        super().train(x, y, test_size)
+    def train(self, x, y, test_size, seed=19):
+        super().train(x, y, test_size, seed)
 
     def show_info(self):
         print("Logistic Regression Model:")

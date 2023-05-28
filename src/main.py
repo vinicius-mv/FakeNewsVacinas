@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import pandas as pd
 
@@ -27,9 +28,11 @@ Y = data['is_missinginfo']
 
 print("Training models...")
 
-model_log.train(X, Y, test_size=0.25)
-model_dtree.train(X, Y, test_size=0.25)
-model_nb.train(X, Y, test_size=0.25)
+random_seed = random.randint(0, 1000)
+
+model_log.train(X, Y, test_size=0.25, seed=random_seed)
+model_dtree.train(X, Y, test_size=0.25, seed=random_seed)
+model_nb.train(X, Y, test_size=0.25, seed=random_seed)
 
 print("Models trained!")
 

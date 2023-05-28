@@ -59,12 +59,12 @@ class PredictionModel(object):
                 total = total + 1.0
         return total
 
-    def train(self, x, y, test_size=0.25):
+    def train(self, x, y, test_size, seed=19):
         # Preprocess tweets
         x_preprocessed = [self.preprocess_text(tweet) for tweet in x]
 
         # Split data between train and test
-        x_train, x_test, y_train, y_test = train_test_split(x_preprocessed, y, test_size=test_size)
+        x_train, x_test, y_train, y_test = train_test_split(x_preprocessed, y, test_size=test_size, random_state=seed)
 
         # Set train size control fields
         self.total_tweets_train = len(x)
@@ -72,7 +72,7 @@ class PredictionModel(object):
 
         # Create TF-IDF vectorizer
         # self.vectorizer = TfidfVectorizer()
-        self.vectorizer = TfidfVectorizer(strip_accents="ascii", ngram_range=(1, 2))
+        self.vectorizer = TfidfVectorizer(strip_accents="ascii", ngram_range=(1, 3))
         x_tfidf = self.vectorizer.fit_transform(x_train)
         
         # Train model
