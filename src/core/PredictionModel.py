@@ -35,6 +35,7 @@ class PredictionModel(object):
         # Convert abreviations
         text = re.sub(r"\sq\s", " que ", text)
         text = re.sub(r"\svc\s", " você ", text)
+        text = re.sub(r"\smsm\s", " mesmo ", text)
 
         # Lemmatize tokens and remove stopwords 
         stop_words = set(stopwords.words('portuguese'))

@@ -27,9 +27,9 @@ Y = data['is_missinginfo']
 
 print("Training models...")
 
-model_log.train(X, Y, test_size=0.33)
-model_dtree.train(X, Y, test_size=0.33)
-model_nb.train(X, Y, test_size=0.33)
+model_log.train(X, Y, test_size=0.25)
+model_dtree.train(X, Y, test_size=0.25)
+model_nb.train(X, Y, test_size=0.25)
 
 print("Models trained!")
 
