@@ -6,13 +6,13 @@ from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 
-spacy.cli.download("pt_core_news_sm")
+#spacy.cli.download("pt_core_news_sm")
 nlp = spacy.load("pt_core_news_sm")
 
 nltk.download('punkt')
 nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('omw-1.4')
+#nltk.download('wordnet')
+#nltk.download('omw-1.4')
 
 class PredictionModel(object):
     
@@ -72,7 +72,7 @@ class PredictionModel(object):
 
         # Create TF-IDF vectorizer
         # self.vectorizer = TfidfVectorizer()
-        self.vectorizer = TfidfVectorizer(strip_accents="ascii", ngram_range=(1, 3))
+        self.vectorizer = TfidfVectorizer(strip_accents="ascii", ngram_range=(1, 1))
         x_tfidf = self.vectorizer.fit_transform(x_train)
         
         # Train model
