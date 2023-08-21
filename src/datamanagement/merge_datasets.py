@@ -4,23 +4,25 @@ sys.path.insert(0,"..")
 import pandas as pd
 import os
 
-from utils.path import get_main_path
+files_path = f"..\\datasets\\"
 
-absolute_path = get_main_path()
+# files already merged: 
+# 1. 'vacina sem eficácia-tweets.csv', 
+# 2. 'vacina sem comprovação-tweets.csv', 
+# 3. 'vacina cobaia-tweets.csv
+# 4. TODO: 'vacinas-tweets.csv
+files_to_read = ['vacina-tweets.csv']
 
-# files already merged vacina sem eficácia-tweets.csv', 'vacina sem comprovação-tweets.csv', 'vacina cobaia-tweets.csv
-files_to_read = []
-
-final_path = absolute_path + "\\vacinas-dataset.csv"
+final_path = files_path + "vacinas-dataset.csv"
 
 df = pd.read_csv(final_path, index_col="id")
 
-for f in os.listdir(absolute_path + "\\temp"):
-    print(f)
+for f in os.listdir(files_path):
     if f not in files_to_read:
         continue
-    temp_path = absolute_path + "\\temp\\" + f
-    temp_df = pd.read_csv(temp_path, index_col="id")
+    print(f)
+    current_file_path = files_path + f
+    temp_df = pd.read_csv(current_file_path, index_col="id")
     df = pd.concat([df, temp_df], axis=0)
 
 # filter portuguese messages only
