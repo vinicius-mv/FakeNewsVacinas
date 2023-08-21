@@ -13,6 +13,8 @@ collection = "tweets"
 query = {"is_missinginfo": np.NaN}
 cursor = client.find(collection, query)
 
+print("Reading dataset...")
+
 df = pd.DataFrame(cursor)
 df.head()
 df.set_index("_id", inplace=True)
