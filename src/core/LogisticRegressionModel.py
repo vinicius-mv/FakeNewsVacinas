@@ -10,6 +10,7 @@ from core.PredictionModel import PredictionModel
 class LogisticRegressionModel(PredictionModel):
     def __init__(self):
         super().__init__()
+        self.model_name = "Logistic Regression"
         self.model = LogisticRegression()
 
     @staticmethod
@@ -20,7 +21,6 @@ class LogisticRegressionModel(PredictionModel):
         super().train(x, y, test_size, seed)
 
     def show_info(self):
-        print("Logistic Regression Model:")
         super().show_info()
 
     def model_score(self, x, y):

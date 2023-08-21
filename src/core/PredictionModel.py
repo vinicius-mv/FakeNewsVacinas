@@ -1,10 +1,13 @@
 import re
 import nltk
 import spacy
+import pandas as pd
 
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
+from sklearn import metrics
+import matplotlib.pyplot as plt
 
 #spacy.cli.download("pt_core_news_sm")
 nlp = spacy.load("pt_core_news_sm")
@@ -21,8 +24,10 @@ class PredictionModel(object):
         self.vectorizer = None
         self.fake_tweets_train = None
         self.total_tweets_train = None
-        self.model_train_accuracy = None
-        self.model_test_accuracy = None
+        self.accuracy_score = None
+        self.precision_score = None
+        self.recall_score = None
+        self.model_name = None
         
     @staticmethod
     def preprocess_text(text):
@@ -33,9 +38,11 @@ class PredictionModel(object):
         text = re.sub(r"[^\w\s?\"]", "", text)
         
         # Convert abreviations
+        text = re.sub(r"\spq\s", " porque ", text)
         text = re.sub(r"\sq\s", " que ", text)
         text = re.sub(r"\svc\s", " você ", text)
         text = re.sub(r"\smsm\s", " mesmo ", text)
+        
 
         # Lemmatize tokens and remove stopwords 
         stop_words = set(stopwords.words('portuguese'))
@@ -53,10 +60,10 @@ class PredictionModel(object):
     @staticmethod
     def get_fake_tweets_length(Y: list):
         total = 0
-        y: float
+        y: int
         for y in Y:
-            if (float(y) == 1.0):
-                total = total + 1.0
+            if (int(y) == 1):
+                total = total + 1
         return total
 
     def train(self, x, y, test_size, seed=19):
@@ -68,29 +75,26 @@ class PredictionModel(object):
 
         # Set train size control fields
         self.total_tweets_train = len(x)
-        self.fake_tweets_train = self.get_fake_tweets_length(y_train)
+        self.fake_tweets_train = self.get_fake_tweets_length(y)
 
         # Create TF-IDF vectorizer
-        # self.vectorizer = TfidfVectorizer()
         self.vectorizer = TfidfVectorizer(strip_accents="ascii", ngram_range=(1, 1))
         x_tfidf = self.vectorizer.fit_transform(x_train)
         
         # Train model
         self.model.fit(x_tfidf, y_train)
-
-        # Calculate model accuracy
-        self.model_train_accuracy = self.model_score(x_train, y_train)
-        self.model_test_accuracy = self.model_score(x_test, y_test)
+        
+        # model scores
+        self.calculate_scores(x_test, y_test)
 
     def show_info(self):
-        print('Model train - total tweets: ' + str(self.total_tweets_train))
-        print('Model train - fake tweets: ' + str(self.fake_tweets_train))
-        print('Model train - Accuracy: ' + str(self.model_train_accuracy))
-        print('Model test - Accuracy: ' + str(self.model_test_accuracy))
-
-    def model_score(self, x, y):
-        x_tfidf = self.vectorizer.transform(x)
-        return self.model.score(x_tfidf, y)
+        print(f"Model {self.model_name}")
+        print('Model - total tweets (train): ' + str(self.total_tweets_train))
+        print('Model - fake tweets (train): ' + str(self.fake_tweets_train))
+        print('Model - accuracy score: ' + str(self.accuracy_score))
+        print('Model - precision score: ' + str(self.precision_score))
+        print('Model - recall score: ' + str(self.recall_score))
+        print()
 
     def predict(self, tweets):
         # Preprocess tweets
@@ -103,3 +107,16 @@ class PredictionModel(object):
         predictions = self.model.predict(x_tfidf)
 
         return predictions
+    
+    def calculate_scores(self, x_test, y_test):
+        x_tfidf = self.vectorizer.transform(x_test)
+        y_pred = self.model.predict(x_tfidf)
+        
+        crosstab = pd.crosstab(y_pred, y_test)
+        TP = crosstab[1][1] # true positives
+        TN = crosstab[0][0] # true negatives
+        FP = crosstab[0][1] # false positives
+        FN = crosstab[1][0] # false negatives
+        self.accuracy_score = (TP + TN) / (TP + FP + TN + FN)
+        self.precision_score = TP / (TP + FP)
+        self.recall_score = TP / (TP + FN)

@@ -11,6 +11,7 @@ from core.PredictionModel import PredictionModel
 class NaiveBayesModel(PredictionModel):
     def __init__(self):
         super().__init__()
+        self.model_name = "Naive Bayes"
         self.model = ComplementNB()
 
     @staticmethod
@@ -21,7 +22,6 @@ class NaiveBayesModel(PredictionModel):
         super().train(x, y, test_size, seed)
 
     def show_info(self):
-        print("Naive Bayes Model:")
         super().show_info()
 
     def model_score(self, x, y):

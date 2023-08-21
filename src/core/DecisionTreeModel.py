@@ -7,8 +7,9 @@ from core.PredictionModel import PredictionModel
 class DecisionTreeModel(PredictionModel):
     def __init__(self):
         super().__init__()
+        self.model_name = "Decision Tree"
         self.model = DecisionTreeClassifier()
-
+        
     @staticmethod
     def preprocess_text(text):
         return PredictionModel.preprocess_text(text)
@@ -17,7 +18,6 @@ class DecisionTreeModel(PredictionModel):
         super().train(x, y, test_size, seed)
 
     def show_info(self):
-        print("Decision Tree Model:")
         super().show_info()
 
     def model_score(self, x, y):
