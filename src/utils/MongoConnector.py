@@ -50,6 +50,13 @@ class MongoConnector(object):
             # Send a ping to confirm a successful connection
         except Exception as e:
             print(e)
+          
+    @staticmethod
+    def rename_collection(collection, new_collection_name):
+        try:
+            MongoConnector.DATABASE[collection].rename(new_collection_name)
+        except Exception as e:
+            print(e)
             
     @staticmethod          
     def close():
