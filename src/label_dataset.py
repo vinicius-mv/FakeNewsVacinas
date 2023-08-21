@@ -18,7 +18,7 @@ df.head()
 df.set_index("_id", inplace=True)
 
 # randomize sample
-# data = df.sample(frac=1)
+data = df.sample(frac=1)
 
 updated_rows_df = pd.DataFrame()
 
@@ -29,7 +29,7 @@ def update_row(row):
     client.update_one(collection, query, post)
 
 
-for index, row in df.iterrows():
+for index, row in data.iterrows():
     # tweets already classified
     if row["is_missinginfo"] >= -1:
         continue
