@@ -4,12 +4,11 @@ sys.path.insert(0,"..")
 import pandas as pd
 
 from utils.MongoConnector import MongoConnector
-from utils.path import get_main_path
 
-path = get_main_path()
-
-df = pd.read_csv(path + "\\datasets\\vacinas-dataset.csv")
-df.drop_duplicates(subset=["id"], inplace=True)
+df = pd.read_csv("..\\datasets\\vacinas-dataset.csv")
+df.shape
+df.drop_duplicates(subset=["_id"], inplace=True)
+df.shape
 df.rename(columns={"id": "_id"}, inplace=True)
 
 data = df.to_dict("records")
