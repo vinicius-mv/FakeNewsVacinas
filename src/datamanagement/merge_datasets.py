@@ -27,14 +27,16 @@ cursor = client.find(collection, query)
 df = pd.DataFrame(cursor)
 df.head()
 df.set_index("_id", inplace=True)
+df.shape
 
 for f in os.listdir(files_path):
     if f not in files_to_read:
         continue
     print(f)
     current_file_path = files_path + f
-    temp_df = pd.read_csv(current_file_path, index_col="id")
-    temp_df.rename(columns={'id': '_id'}, inplace=True)
+    temp_df = pd.read_csv(current_file_path)
+    temp_df.rename(columns={temp_df.columns[0]: '_id'}, inplace=True)
+    temp_df.set_index('_id', inplace=True)
     df = pd.concat([df, temp_df], axis=0)
 
 # filter portuguese messages only
@@ -45,8 +47,7 @@ print(df.shape)
 df.drop_duplicates(inplace=True)
 print(df.shape)
 
-df.head()
-df.to_csv("vacinas-dataset.csv", mode="w+", index=True)
+df.to_csv("..\\datasets\\vacinas-dataset.csv", mode="w+", index=True)
 
 print(f"temp datasets merged into file {final_path}")
 print("DONE!")
