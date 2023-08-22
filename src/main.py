@@ -6,6 +6,7 @@ from utils.MongoConnector import MongoConnector
 from core.DecisionTreeModel import DecisionTreeModel
 from core.LogisticRegressionModel import LogisticRegressionModel
 from core.NaiveBayesModel import NaiveBayesModel
+from core.ChartGenerator import ChartGenerator
 
 
 client = MongoConnector()
@@ -51,6 +52,8 @@ y = model_dtree.predict([text1])
 print('y:' + str(y))
 z = model_nb.predict([text1])
 print('z:' + str(z))
+
+chart = ChartGenerator.get_dataset_classes_proportion(data)
 
 client.close()
 
