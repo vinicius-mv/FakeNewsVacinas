@@ -21,13 +21,15 @@ class PredictionModel(object):
     
     def __init__(self):
         self.model = None
+        self.model_name = None
         self.vectorizer = None
-        self.fake_tweets_train = None
-        self.total_tweets_train = None
+        self.total_fake_tweets = None
+        self.total_tweets = None
         self.accuracy_score = None
         self.precision_score = None
         self.recall_score = None
-        self.model_name = None
+        self.f1_score = None
+        self.crosstab = None
         
     @staticmethod
     def preprocess_text(text):
@@ -74,8 +76,8 @@ class PredictionModel(object):
         x_train, x_test, y_train, y_test = train_test_split(x_preprocessed, y, test_size=test_size, random_state=seed)
 
         # Set train size control fields
-        self.total_tweets_train = len(x)
-        self.fake_tweets_train = self.get_fake_tweets_length(y)
+        self.total_tweets = len(x)
+        self.total_fake_tweets = self.get_fake_tweets_length(y)
 
         # Create TF-IDF vectorizer
         self.vectorizer = TfidfVectorizer(strip_accents="ascii", ngram_range=(1, 1))
@@ -89,11 +91,12 @@ class PredictionModel(object):
 
     def show_info(self):
         print(f"Model {self.model_name}")
-        print('Model - total tweets (train): ' + str(self.total_tweets_train))
-        print('Model - fake tweets (train): ' + str(self.fake_tweets_train))
+        print('Model - total tweets (train): ' + str(self.total_tweets))
+        print('Model - fake tweets (train): ' + str(self.total_fake_tweets))
         print('Model - accuracy score: ' + str(self.accuracy_score))
         print('Model - precision score: ' + str(self.precision_score))
         print('Model - recall score: ' + str(self.recall_score))
+        print('Model - f1 score: ' + str(self.f1_score))
         print()
 
     def predict(self, tweets):
@@ -112,11 +115,12 @@ class PredictionModel(object):
         x_tfidf = self.vectorizer.transform(x_test)
         y_pred = self.model.predict(x_tfidf)
         
-        crosstab = pd.crosstab(y_pred, y_test)
-        TP = crosstab[1][1] # true positives
-        TN = crosstab[0][0] # true negatives
-        FP = crosstab[0][1] # false positives
-        FN = crosstab[1][0] # false negatives
+        self.crosstab = pd.crosstab(y_pred, y_test)
+        TP = self.crosstab[1][1] # true positives
+        TN = self.crosstab[0][0] # true negatives
+        FP = self.crosstab[0][1] # false positives
+        FN = self.crosstab[1][0] # false negatives
         self.accuracy_score = (TP + TN) / (TP + FP + TN + FN)
         self.precision_score = TP / (TP + FP)
-        self.recall_score = TP / (TP + FN)
+        self.recall_score = TP / (TP + FN) # revocação
+        self.f1_score = (2 * self.precision_score * self.recall_score) / (self.precision_score + self.recall_score)
