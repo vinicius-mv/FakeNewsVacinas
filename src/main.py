@@ -8,7 +8,6 @@ from core.LogisticRegressionModel import LogisticRegressionModel
 from core.NaiveBayesModel import NaiveBayesModel
 from core.ChartGenerator import ChartGenerator
 
-
 client = MongoConnector()
 client.initialize()
 
@@ -19,7 +18,7 @@ cursor = client.find(collection, query)
 data = pd.DataFrame(cursor)
 data.set_index("_id", inplace=True)
 
-# Initilize prediction models
+# Initialize prediction models
 model_log = LogisticRegressionModel()
 model_dtree = DecisionTreeModel()
 model_nb = NaiveBayesModel()
@@ -45,7 +44,7 @@ model_nb.show_info()
 text1 = "@Oplebeu92 @DanielaAdornoM1 @folha Então já q vc é informado me fale sobre duas situações: já q falou da " \
         "vacina, o que diz do presidente fazer propaganda e comprar um remédio não tem comprovação científica pra " \
         "tratar a covid com dinheiro publico? E qual o plano do governo de combate a pandemia? Sem rodeios"
-        
+
 x = model_log.predict([text1])
 print('x:' + str(x))
 y = model_dtree.predict([text1])

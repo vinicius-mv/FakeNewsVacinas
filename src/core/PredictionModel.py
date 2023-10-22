@@ -9,16 +9,15 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 import matplotlib.pyplot as plt
 
-#spacy.cli.download("pt_core_news_sm")
+# spacy.cli.download("pt_core_news_sm")
 nlp = spacy.load("pt_core_news_sm")
 
 nltk.download('punkt')
 nltk.download('stopwords')
-#nltk.download('wordnet')
-#nltk.download('omw-1.4')
+
 
 class PredictionModel(object):
-    
+
     def __init__(self):
         self.model = None
         self.model_name = None
@@ -30,33 +29,32 @@ class PredictionModel(object):
         self.recall_score = None
         self.f1_score = None
         self.crosstab = None
-        
+
     @staticmethod
     def preprocess_text(text):
         # Remove multiples questions mark
         text = re.sub(r"\?+", "?", text)
-        
+
         # Filter symbols, punctuation, etc.
         text = re.sub(r"[^\w\s?\"]", "", text)
-        
+
         # Convert abreviations
         text = re.sub(r"\spq\s", " porque ", text)
         text = re.sub(r"\sq\s", " que ", text)
         text = re.sub(r"\svc\s", " você ", text)
         text = re.sub(r"\smsm\s", " mesmo ", text)
-        
 
         # Lemmatize tokens and remove stopwords 
         stop_words = set(stopwords.words('portuguese'))
         doc = nlp(text)
-        tokens  = [ token.lemma_ for token in doc if token.text not in stop_words ]
-        
+        tokens = [token.lemma_ for token in doc if token.text not in stop_words]
+
         # create a string from tokens
         preprocessed_text = ' '.join(tokens)
-        
+
         # remove multiple whitespaces
         preprocessed_text = re.sub("\s+", " ", preprocessed_text)
-        
+
         return preprocessed_text
 
     @staticmethod
@@ -82,10 +80,10 @@ class PredictionModel(object):
         # Create TF-IDF vectorizer
         self.vectorizer = TfidfVectorizer(strip_accents="ascii", ngram_range=(1, 1))
         x_tfidf = self.vectorizer.fit_transform(x_train)
-        
+
         # Train model
         self.model.fit(x_tfidf, y_train)
-        
+
         # model scores
         self.calculate_scores(x_test, y_test)
 
@@ -110,17 +108,17 @@ class PredictionModel(object):
         predictions = self.model.predict(x_tfidf)
 
         return predictions
-    
+
     def calculate_scores(self, x_test, y_test):
         x_tfidf = self.vectorizer.transform(x_test)
         y_pred = self.model.predict(x_tfidf)
-        
+
         self.crosstab = pd.crosstab(y_pred, y_test)
-        TP = self.crosstab[1][1] # true positives
-        TN = self.crosstab[0][0] # true negatives
-        FP = self.crosstab[0][1] # false positives
-        FN = self.crosstab[1][0] # false negatives
+        TP = self.crosstab[1][1]  # true positives
+        TN = self.crosstab[0][0]  # true negatives
+        FP = self.crosstab[0][1]  # false positives
+        FN = self.crosstab[1][0]  # false negatives
         self.accuracy_score = (TP + TN) / (TP + FP + TN + FN)
         self.precision_score = TP / (TP + FP)
-        self.recall_score = TP / (TP + FN) # revocação
+        self.recall_score = TP / (TP + FN)  # revocação
         self.f1_score = (2 * self.precision_score * self.recall_score) / (self.precision_score + self.recall_score)

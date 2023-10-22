@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
-from core.PredictionModel import PredictionModel
+
+from src.core.PredictionModel import PredictionModel
 
 
 # https://www.geeksforgeeks.org/fake-news-detection-using-machine-learning/
@@ -9,7 +10,7 @@ class DecisionTreeModel(PredictionModel):
         super().__init__()
         self.model_name = "Decision Tree"
         self.model = DecisionTreeClassifier()
-        
+
     @staticmethod
     def preprocess_text(text):
         return PredictionModel.preprocess_text(text)

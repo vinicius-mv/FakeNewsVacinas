@@ -2,7 +2,7 @@ import nltk
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
-from core.PredictionModel import PredictionModel
+from src.core.PredictionModel import PredictionModel
 
 
 # https://www.geeksforgeeks.org/fake-news-detection-using-machine-learning/
