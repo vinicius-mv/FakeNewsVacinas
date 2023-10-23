@@ -1,7 +1,8 @@
 import sys
-sys.path.insert(0,"..")
 
-from utils.MongoConnector import MongoConnector
+from src.utils.MongoConnector import MongoConnector
+
+sys.path.insert(0,"..")
 
 import datetime as dt
 import os

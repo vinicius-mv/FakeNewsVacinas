@@ -1,5 +1,7 @@
 import pymongo
-import config as cfg
+
+from src import config as cfg
+
 
 class MongoConnector(object):
     URI = cfg.mongodb["uri"]
