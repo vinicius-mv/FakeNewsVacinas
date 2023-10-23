@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import pandas as pd
+import spacy
 
 from utils.MongoConnector import MongoConnector
 from core.DecisionTreeModel import DecisionTreeModel
@@ -10,6 +11,9 @@ from core.ChartGenerator import ChartGenerator
 
 client = MongoConnector()
 client.initialize()
+
+# if missing spacy pt_core_new_sm file - run the following command
+# spacy.cli.download("pt_core_news_sm")
 
 # Get data from mongodb
 collection = "tweets"
@@ -28,7 +32,8 @@ Y = data['is_missinginfo']
 
 print("Training models...")
 
-random_seed = random.randint(0, 1000)
+# random_seed = random.randint(0, 1000)
+random_seed = 26 # temp for replicability
 
 model_log.train(X, Y, test_size=0.25, seed=random_seed)
 model_dtree.train(X, Y, test_size=0.25, seed=random_seed)
@@ -39,6 +44,10 @@ print("Models trained!")
 model_log.show_info()
 model_dtree.show_info()
 model_nb.show_info()
+
+ChartGenerator.get_confusion_matrix(model_log)
+ChartGenerator.get_confusion_matrix(model_dtree)
+ChartGenerator.get_confusion_matrix(model_nb)
 
 # Demo predictions using the models
 text1 = "@Oplebeu92 @DanielaAdornoM1 @folha Então já q vc é informado me fale sobre duas situações: já q falou da " \

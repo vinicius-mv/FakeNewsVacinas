@@ -9,7 +9,6 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 import matplotlib.pyplot as plt
 
-# spacy.cli.download("pt_core_news_sm")
 nlp = spacy.load("pt_core_news_sm")
 
 nltk.download('punkt')
@@ -38,7 +37,7 @@ class PredictionModel(object):
         # Filter symbols, punctuation, etc.
         text = re.sub(r"[^\w\s?\"]", "", text)
 
-        # Convert abreviations
+        # Convert abbreviations
         text = re.sub(r"\spq\s", " porque ", text)
         text = re.sub(r"\sq\s", " que ", text)
         text = re.sub(r"\svc\s", " você ", text)
