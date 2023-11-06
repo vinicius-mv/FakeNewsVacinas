@@ -17,14 +17,14 @@ class LogisticRegressionModel(PredictionModel):
     def preprocess_text(text):
         return PredictionModel.preprocess_text(text)
 
-    def train(self, x, y, test_size, seed=19):
-        super().train(x, y, test_size, seed)
+    def train(self, X, Y, test_size, seed=19):
+        super().train(X, Y, test_size, seed)
 
     def show_info(self):
         super().show_info()
 
-    def model_score(self, x, y):
-        return super().model_score(x, y)
-
     def predict(self, tweets):
         return super().predict(tweets)
+
+    def explain_prediction(self, tweet):
+        super()._explain_prediction(tweet)

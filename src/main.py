@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import pandas as pd
+import shap
 import spacy
 
 from utils.MongoConnector import MongoConnector
@@ -9,22 +10,25 @@ from core.LogisticRegressionModel import LogisticRegressionModel
 from core.NaiveBayesModel import NaiveBayesModel
 from core.ChartGenerator import ChartGenerator
 
-client = MongoConnector()
-client.initialize()
-
 # if missing spacy pt_core_new_sm file - run the following command
 # spacy.cli.download("pt_core_news_sm")
 
 # Get data from mongodb
+client = MongoConnector()
+client.initialize()
+print("Loading data...")
 collection = "tweets"
 query = {"is_missinginfo": {"$gt": -1}}
 cursor = client.find(collection, query)
 data = pd.DataFrame(cursor)
+print("Data loaded")
+client.close()
+
 data.set_index("_id", inplace=True)
 
 # Initialize prediction models
-model_log = LogisticRegressionModel()
-model_dtree = DecisionTreeModel()
+model_lr = LogisticRegressionModel()
+model_dt = DecisionTreeModel()
 model_nb = NaiveBayesModel()
 
 X = data['content']
@@ -33,36 +37,38 @@ Y = data['is_missinginfo']
 print("Training models...")
 
 # random_seed = random.randint(0, 1000)
-random_seed = 26 # temp for replicability
+# temp for replicability
+random_seed = 3
 
-model_log.train(X, Y, test_size=0.25, seed=random_seed)
-model_dtree.train(X, Y, test_size=0.25, seed=random_seed)
+model_lr.train(X, Y, test_size=0.25, seed=random_seed)
+model_dt.train(X, Y, test_size=0.25, seed=random_seed)
 model_nb.train(X, Y, test_size=0.25, seed=random_seed)
 
 print("Models trained!")
 
-model_log.show_info()
-model_dtree.show_info()
+model_lr.show_info()
+model_dt.show_info()
 model_nb.show_info()
 
-ChartGenerator.get_confusion_matrix(model_log)
-ChartGenerator.get_confusion_matrix(model_dtree)
-ChartGenerator.get_confusion_matrix(model_nb)
-
-# Demo predictions using the models
-text1 = "@Oplebeu92 @DanielaAdornoM1 @folha Então já q vc é informado me fale sobre duas situações: já q falou da " \
-        "vacina, o que diz do presidente fazer propaganda e comprar um remédio não tem comprovação científica pra " \
-        "tratar a covid com dinheiro publico? E qual o plano do governo de combate a pandemia? Sem rodeios"
-
-x = model_log.predict([text1])
-print('x:' + str(x))
-y = model_dtree.predict([text1])
-print('y:' + str(y))
-z = model_nb.predict([text1])
-print('z:' + str(z))
-
+# Charts
+model_lr.get_confusion_matrix()
+model_dt.get_confusion_matrix()
+model_nb.get_confusion_matrix()
 chart = ChartGenerator.get_dataset_classes_proportion(data)
 
-client.close()
+# Demo predictions using the models
+text1 =  model_lr.X_test[0]
+
+y0_test_lr = model_lr.predict([text1])
+print('x:' + str(y0_test_lr))
+
+y0_test_dt = model_dt.predict([text1])
+print('y:' + str(y0_test_dt))
+
+y0_test_nb = model_nb.predict([text1])
+print('z:' + str(y0_test_nb))
+
+model_lr.explain_prediction(text1)
+# model_dt.explain_prediction(text1)
 
 print("DONE!")

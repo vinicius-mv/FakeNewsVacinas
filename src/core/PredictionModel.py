@@ -2,11 +2,12 @@ import re
 import nltk
 import spacy
 import pandas as pd
+import seaborn as sn
+import shap
 
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
-from sklearn import metrics
 import matplotlib.pyplot as plt
 
 nlp = spacy.load("pt_core_news_sm")
@@ -29,8 +30,18 @@ class PredictionModel(object):
         self.f1_score = None
         self.crosstab = None
 
+        self.X_train = None
+        self.X_train_tfidf = None
+        self.X_test = None
+        self.X_test_tfidf = None
+        self.Y_train = None
+        self.Y_test = None
+
     @staticmethod
     def preprocess_text(text):
+        # normalize message
+        text = text.lower()
+
         # Remove multiples questions mark
         text = re.sub(r"\?+", "?", text)
 
@@ -65,26 +76,26 @@ class PredictionModel(object):
                 total = total + 1
         return total
 
-    def train(self, x, y, test_size, seed=19):
+    def train(self, X, Y, test_size, seed=19):
         # Preprocess tweets
-        x_preprocessed = [self.preprocess_text(tweet) for tweet in x]
+        X_preprocessed = [self.preprocess_text(tweet) for tweet in X]
 
         # Split data between train and test
-        x_train, x_test, y_train, y_test = train_test_split(x_preprocessed, y, test_size=test_size, random_state=seed)
+        self.X_train, self.X_test, self.Y_train, self.Y_test = train_test_split(X_preprocessed, Y, test_size=test_size, random_state=seed)
 
         # Set train size control fields
-        self.total_tweets = len(x)
-        self.total_fake_tweets = self.get_fake_tweets_length(y)
+        self.total_tweets = len(X)
+        self.total_fake_tweets = self.get_fake_tweets_length(Y)
 
         # Create TF-IDF vectorizer
         self.vectorizer = TfidfVectorizer(strip_accents="ascii", ngram_range=(1, 1))
-        x_tfidf = self.vectorizer.fit_transform(x_train)
+        self.X_train_tfidf = self.vectorizer.fit_transform(self.X_train)
 
         # Train model
-        self.model.fit(x_tfidf, y_train)
+        self.model.fit(self.X_train_tfidf, self.Y_train)
 
         # model scores
-        self.calculate_scores(x_test, y_test)
+        self.calculate_scores(self.X_test, self.Y_test)
 
     def show_info(self):
         print(f"Model {self.model_name}")
@@ -109,8 +120,8 @@ class PredictionModel(object):
         return predictions
 
     def calculate_scores(self, x_test, y_test):
-        x_tfidf = self.vectorizer.transform(x_test)
-        y_pred = self.model.predict(x_tfidf)
+        self.X_test_tfidf = self.vectorizer.transform(x_test)
+        y_pred = self.model.predict(self.X_test_tfidf)
 
         self.crosstab = pd.crosstab(y_pred, y_test)
         TP = self.crosstab[1][1]  # true positives
@@ -121,3 +132,25 @@ class PredictionModel(object):
         self.precision_score = TP / (TP + FP)
         self.recall_score = TP / (TP + FN)  # revocação
         self.f1_score = (2 * self.precision_score * self.recall_score) / (self.precision_score + self.recall_score)
+
+    def get_confusion_matrix(self):
+        ax = sn.heatmap(self.crosstab, annot=True)
+        ax.set_title(self.model_name)
+        ax.set(xlabel="Valores Reais")
+        ax.set(ylabel="Valores Previstos")
+        plt.show()
+
+    def _explain_prediction(self, tweet):
+        shap.initjs()
+        explainer = shap.Explainer(self.model, self.X_train_tfidf)
+
+        # Explain predictions for a specific instance
+        # Preprocess tweets
+        preprocessed_tweet = self.preprocess_text(tweet)
+        # Vectorize tweets
+        x_tfidf = self.vectorizer.transform([preprocessed_tweet])
+
+        shap_values = explainer(x_tfidf)
+
+        shap.summary_plot(shap_values, x_tfidf,
+                          feature_names=self.vectorizer.get_feature_names_out())
