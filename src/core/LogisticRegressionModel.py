@@ -1,5 +1,6 @@
 import nltk
 import pandas as pd
+import shap
 from sklearn.linear_model import LogisticRegression
 
 from src.core.PredictionModel import PredictionModel
@@ -26,5 +27,5 @@ class LogisticRegressionModel(PredictionModel):
     def predict(self, tweets):
         return super().predict(tweets)
 
-    def explain_prediction(self, tweet):
-        super()._explain_prediction(tweet)
+    def analyze_shap_values(self, tweets):
+        super()._analyze_shap_values(tweets)

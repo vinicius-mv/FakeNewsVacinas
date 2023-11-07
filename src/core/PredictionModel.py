@@ -29,6 +29,7 @@ class PredictionModel(object):
         self.recall_score = None
         self.f1_score = None
         self.crosstab = None
+        self.explainer = None
 
         self.X_train = None
         self.X_train_tfidf = None
@@ -76,7 +77,7 @@ class PredictionModel(object):
                 total = total + 1
         return total
 
-    def train(self, X, Y, test_size, seed=19):
+    def train(self, X, Y, test_size, seed=19, need_dense_data=False):
         # Preprocess tweets
         X_preprocessed = [self.preprocess_text(tweet) for tweet in X]
 
@@ -90,12 +91,18 @@ class PredictionModel(object):
         # Create TF-IDF vectorizer
         self.vectorizer = TfidfVectorizer(strip_accents="ascii", ngram_range=(1, 1))
         self.X_train_tfidf = self.vectorizer.fit_transform(self.X_train)
+        self.X_test_tfidf = self.vectorizer.transform(self.X_test)
+
+        # prepare data
+        if(need_dense_data):
+            self.X_train_tfidf = self.X_train_tfidf.toarray()
+            self.X_test_tfidf = self.X_test_tfidf.toarray()
 
         # Train model
         self.model.fit(self.X_train_tfidf, self.Y_train)
 
         # model scores
-        self.calculate_scores(self.X_test, self.Y_test)
+        self.calculate_scores()
 
     def show_info(self):
         print(f"Model {self.model_name}")
@@ -113,21 +120,22 @@ class PredictionModel(object):
 
         # Vectorize tweets
         x_tfidf = self.vectorizer.transform(preprocessed_tweets)
+        x_tfidf = x_tfidf.toarray()
 
         # Make predictions
         predictions = self.model.predict(x_tfidf)
 
         return predictions
 
-    def calculate_scores(self, x_test, y_test):
-        self.X_test_tfidf = self.vectorizer.transform(x_test)
+    def calculate_scores(self):
         y_pred = self.model.predict(self.X_test_tfidf)
+        self.crosstab = pd.crosstab(y_pred, self.Y_test)
 
-        self.crosstab = pd.crosstab(y_pred, y_test)
         TP = self.crosstab[1][1]  # true positives
         TN = self.crosstab[0][0]  # true negatives
         FP = self.crosstab[0][1]  # false positives
         FN = self.crosstab[1][0]  # false negatives
+
         self.accuracy_score = (TP + TN) / (TP + FP + TN + FN)
         self.precision_score = TP / (TP + FP)
         self.recall_score = TP / (TP + FN)  # revocação
@@ -140,17 +148,32 @@ class PredictionModel(object):
         ax.set(ylabel="Valores Previstos")
         plt.show()
 
-    def _explain_prediction(self, tweet):
-        shap.initjs()
-        explainer = shap.Explainer(self.model, self.X_train_tfidf)
+    def _analyze_shap_values(self, tweets):
+        if (self.explainer == None):
+            self.explainer = shap.Explainer(self.model, self.X_train_tfidf)
 
-        # Explain predictions for a specific instance
-        # Preprocess tweets
-        preprocessed_tweet = self.preprocess_text(tweet)
+        # Preprocess data (clean, normalize and lemmatize data)
+        preprocessed_tweets = [self.preprocess_text(tweet) for tweet in tweets]
+
         # Vectorize tweets
-        x_tfidf = self.vectorizer.transform([preprocessed_tweet])
+        x_tfidf = self.vectorizer.transform(preprocessed_tweets)
 
-        shap_values = explainer(x_tfidf)
+        if (self.explainer == None):
+            self.explainer = shap.Explainer(self.model, self.X_train_tfidf)
+
+        shap_values = self.explainer(x_tfidf)
 
         shap.summary_plot(shap_values, x_tfidf,
                           feature_names=self.vectorizer.get_feature_names_out())
+
+    def _explain_features_importance(self, tweets):
+
+        if (self.explainer == None):
+            # generic explainer (work for several models)
+            self.explainer = shap.Explainer(self.model, self.X_train_tfidf)
+        # Explain predictions
+        preprocessed_tweets = [self.preprocess_text(tweet) for tweet in tweets]
+        # Vectorize tweets
+        x_tfidf = self.vectorizer.transform(preprocessed_tweets)
+        shap_values = self.explainer(x_tfidf)
+        shap.summary_plot(shap_values, x_tfidf, feature_names=self.vectorizer.get_feature_names_out())

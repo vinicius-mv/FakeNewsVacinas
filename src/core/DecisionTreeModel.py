@@ -24,5 +24,5 @@ class DecisionTreeModel(PredictionModel):
     def predict(self, tweets):
         return super().predict(tweets)
 
-    def explain_prediction(self, tweet):
+    def analyze_shap_values(self, tweet):
         raise NotImplemented()
