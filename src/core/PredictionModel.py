@@ -97,15 +97,17 @@ class PredictionModel(object):
         # model scores
         self.calculate_scores(self.X_test, self.Y_test)
 
-    def show_info(self):
+    def dataset_info(self):
+        print('Total tweets: ' + str(self.total_tweets))
+        print('Fake tweets: ' + str(self.total_fake_tweets))
+        print(f'Test proportion: {len(self.X_test) / len(self.X_train)}')
+
+    def model_info(self):
         print(f"Model {self.model_name}")
-        print('Model - total tweets (train): ' + str(self.total_tweets))
-        print('Model - fake tweets (train): ' + str(self.total_fake_tweets))
         print('Model - accuracy score: ' + str(self.accuracy_score))
         print('Model - precision score: ' + str(self.precision_score))
         print('Model - recall score: ' + str(self.recall_score))
         print('Model - f1 score: ' + str(self.f1_score))
-        print()
 
     def predict(self, tweets):
         # Preprocess tweets
@@ -140,10 +142,8 @@ class PredictionModel(object):
         ax.set(ylabel="Valores Previstos")
         plt.show()
 
-    def _explain_prediction(self, tweet):
-        shap.initjs()
+    def explain_prediction(self, tweet):
         explainer = shap.Explainer(self.model, self.X_train_tfidf)
-
         # Explain predictions for a specific instance
         # Preprocess tweets
         preprocessed_tweet = self.preprocess_text(tweet)

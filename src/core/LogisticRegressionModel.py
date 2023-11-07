@@ -12,19 +12,3 @@ class LogisticRegressionModel(PredictionModel):
         super().__init__()
         self.model_name = "Logistic Regression"
         self.model = LogisticRegression()
-
-    @staticmethod
-    def preprocess_text(text):
-        return PredictionModel.preprocess_text(text)
-
-    def train(self, X, Y, test_size, seed=19):
-        super().train(X, Y, test_size, seed)
-
-    def show_info(self):
-        super().show_info()
-
-    def predict(self, tweets):
-        return super().predict(tweets)
-
-    def explain_prediction(self, tweet):
-        super()._explain_prediction(tweet)

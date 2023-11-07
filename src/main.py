@@ -21,7 +21,7 @@ collection = "tweets"
 query = {"is_missinginfo": {"$gt": -1}}
 cursor = client.find(collection, query)
 data = pd.DataFrame(cursor)
-print("Data loaded")
+print(f"Data loaded - shape {data.shape}")
 client.close()
 
 data.set_index("_id", inplace=True)
@@ -40,15 +40,18 @@ print("Training models...")
 # temp for replicability
 random_seed = 3
 
+
 model_lr.train(X, Y, test_size=0.25, seed=random_seed)
 model_dt.train(X, Y, test_size=0.25, seed=random_seed)
 model_nb.train(X, Y, test_size=0.25, seed=random_seed)
 
 print("Models trained!")
 
-model_lr.show_info()
-model_dt.show_info()
-model_nb.show_info()
+model_lr.dataset_info()
+
+model_lr.model_info()
+model_dt.model_info()
+model_nb.model_info()
 
 # Charts
 model_lr.get_confusion_matrix()
@@ -57,18 +60,20 @@ model_nb.get_confusion_matrix()
 chart = ChartGenerator.get_dataset_classes_proportion(data)
 
 # Demo predictions using the models
-text1 =  model_lr.X_test[0]
+message = ("@Oplebeu92 @DanielaAdornoM1 @folha Então já q vc é informado me fale sobre duas situações: já q falou da "
+           "vacina, o que diz do presidente fazer propaganda e comprar um remédio não tem comprovação científica pra "
+           "tratar a covid com dinheiro publico? E qual o plano do governo de combate a pandemia? Sem rodeios")
 
-y0_test_lr = model_lr.predict([text1])
-print('x:' + str(y0_test_lr))
+y0_test_lr = model_lr.predict([message])
+print('pred (lr):' + str(y0_test_lr))
 
-y0_test_dt = model_dt.predict([text1])
-print('y:' + str(y0_test_dt))
+y0_test_dt = model_dt.predict([message])
+print('pred (dt):' + str(y0_test_dt))
 
-y0_test_nb = model_nb.predict([text1])
-print('z:' + str(y0_test_nb))
+y0_test_nb = model_nb.predict([message])
+print('pred (nb):' + str(y0_test_nb))
 
-model_lr.explain_prediction(text1)
+model_lr.explain_prediction(message)
 # model_dt.explain_prediction(text1)
 
 print("DONE!")

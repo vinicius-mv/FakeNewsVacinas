@@ -11,18 +11,6 @@ class DecisionTreeModel(PredictionModel):
         self.model_name = "Decision Tree"
         self.model = DecisionTreeClassifier()
 
-    @staticmethod
-    def preprocess_text(text):
-        return PredictionModel.preprocess_text(text)
-
-    def train(self, X, Y, test_size, seed=19):
-        super().train(X, Y, test_size, seed)
-
-    def show_info(self):
-        super().show_info()
-
-    def predict(self, tweets):
-        return super().predict(tweets)
-
     def explain_prediction(self, tweet):
         raise NotImplemented()
+
