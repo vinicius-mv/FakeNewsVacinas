@@ -38,8 +38,7 @@ print("Training models...")
 
 # random_seed = random.randint(0, 1000)
 # temp for replicability
-random_seed = 3
-
+random_seed = 17
 
 model_lr.train(X, Y, test_size=0.25, seed=random_seed)
 model_dt.train(X, Y, test_size=0.25, seed=random_seed)
@@ -52,6 +51,7 @@ model_lr.dataset_info()
 model_lr.model_info()
 model_dt.model_info()
 model_nb.model_info()
+print("\n\n")
 
 # Charts
 model_lr.get_confusion_matrix()
@@ -74,6 +74,5 @@ y0_test_nb = model_nb.predict([message])
 print('pred (nb):' + str(y0_test_nb))
 
 model_lr.explain_prediction(message)
-# model_dt.explain_prediction(text1)
 
 print("DONE!")
