@@ -37,6 +37,8 @@ class PredictionModel(object):
         self.Y_train = None
         self.Y_test = None
 
+        self.explainer = None
+
     @staticmethod
     def preprocess_text(text):
         # normalize message
@@ -142,15 +144,47 @@ class PredictionModel(object):
         ax.set(ylabel="Valores Previstos")
         plt.show()
 
-    def explain_prediction(self, tweet):
-        explainer = shap.Explainer(self.model, self.X_train_tfidf)
+    def explainer_summary_plot(self, tweets):
+
+        self._load_explainer()
+
         # Explain predictions for a specific instance
         # Preprocess tweets
-        preprocessed_tweet = self.preprocess_text(tweet)
+        preprocessed_tweets = [self.preprocess_text(tweet) for tweet in tweets]
+
         # Vectorize tweets
-        x_tfidf = self.vectorizer.transform([preprocessed_tweet])
+        x_tfidf = self.vectorizer.transform(preprocessed_tweets)
 
-        shap_values = explainer(x_tfidf)
+        shap_values = self.explainer(x_tfidf)
 
-        shap.summary_plot(shap_values, x_tfidf,
-                          feature_names=self.vectorizer.get_feature_names_out())
+        shap.summary_plot(shap_values, x_tfidf, plot_size=(6,6))
+
+    def explainer_beeswarm_plot(self, tweets):
+
+        self._load_explainer()
+
+        # Explain predictions for a specific instance
+        # Preprocess tweets
+        preprocessed_tweets = [self.preprocess_text(tweet) for tweet in tweets]
+
+        # Vectorize tweets
+        x_tfidf = self.vectorizer.transform(preprocessed_tweets)
+
+        shap_values = self.explainer(x_tfidf)
+
+        shap.plots.beeswarm(shap_values, plot_size=(6,6))
+
+
+
+    def _pre_process_tweets(self, tweets):
+        # Preprocess tweets
+        preprocessed_tweets = []
+        for tweet in tweets:
+            preprocessed_tweets.append(self.preprocess_text(tweet))
+        return preprocessed_tweets
+
+    def _load_explainer(self):
+        if (self.explainer is not None):
+            return
+
+        self.explainer = shap.Explainer(self.model, self.X_train_tfidf, feature_names=self.vectorizer.get_feature_names_out())
