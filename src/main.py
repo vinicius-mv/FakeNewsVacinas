@@ -1,16 +1,14 @@
-import random
-import numpy as np
 import pandas as pd
-import shap
-import spacy
 
-from utils.MongoConnector import MongoConnector
+
+from core.ChartGenerator import ChartGenerator
 from core.DecisionTreeModel import DecisionTreeModel
 from core.LogisticRegressionModel import LogisticRegressionModel
 from core.NaiveBayesModel import NaiveBayesModel
-from core.ChartGenerator import ChartGenerator
+from utils.MongoConnector import MongoConnector
 
 # if missing spacy pt_core_new_sm file - run the following command
+# import spacy
 # spacy.cli.download("pt_core_news_sm")
 
 # Get data from mongodb
@@ -88,7 +86,7 @@ print('pred (dt):' + str(y0_test_dt))
 y0_test_nb = model_nb.predict([message_fake1])
 print('pred (nb):' + str(y0_test_nb))
 
-model_lr.explainer_summary_plot(model_lr.X_train)
+# model_lr.explainer_summary_plot(model_lr.X_train)
 model_lr.explainer_beeswarm_plot(model_lr.X_train)
 
 # model_lr.explainer_detailed_plot(message_fake1)

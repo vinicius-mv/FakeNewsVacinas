@@ -1,10 +1,7 @@
-import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sn
-
-from src.core import PredictionModel
+import pandas as pd
+import seaborn as sns
 
 
 class ChartGenerator(object):

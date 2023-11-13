@@ -1,7 +1,8 @@
 import sys
-sys.path.insert(0,"..")
 
-from utils.path import get_main_path
+from src.utils.path import get_main_path
+
+sys.path.insert(0,"..")
 
 import snscrape.modules.twitter as sntwitter
 import pandas as pd
