@@ -15,7 +15,10 @@ class NaiveBayesModel(PredictionModel):
         self.model_name = "Naive Bayes"
         self.model = ComplementNB()
 
-    def explain_prediction(self, tweet):
+    def explainer_summary_plot(self, tweet):
+        raise NotImplemented()
+
+    def explainer_beeswarm_plot(self, tweet):
         raise NotImplemented()
 
 

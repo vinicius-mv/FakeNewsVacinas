@@ -11,6 +11,9 @@ class DecisionTreeModel(PredictionModel):
         self.model_name = "Decision Tree"
         self.model = DecisionTreeClassifier()
 
-    def explain_prediction(self, tweet):
+    def explainer_summary_plot(self, tweet):
+        raise NotImplemented()
+
+    def explainer_beeswarm_plot(self, tweet):
         raise NotImplemented()
 
