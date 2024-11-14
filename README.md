@@ -1,11 +1,14 @@
 # FakeNewsVacinas
 
-## Requerimentos
+The project FakeNewsVacinas focuses on detecting misinformation related to COVID vaccines using Python and NTLTK. It leverages machine learning techniques to classify tweets as either fake or real. The repository includes Python scripts, dependencies listed in a requirements.txt file, and instructions for setting up the environment using Anaconda. The project aims to analyze and filter vaccine-related content, potentially using NLP models for text classification.
 
-1. Instalar Anaconda Distribuition para Python 3 no link: https://www.anaconda.com/products/distribution
+## Requirements
 
-2.  Iniciar o AnacondaPrompt e navegar até a pasta raiz do repositório.
+1. **Install Anaconda**: Download the Python 3 version from [Anaconda's official site](https://www.anaconda.com/products/distribution).
 
-3. Instalar os requirements do repositório, na pasta raiz do projeto, onde se encotra o arquivo 'requirements.txt',  digite: pip install -r requirements.txt
+2. **Open Anaconda Prompt**: Navigate to the project's root directory.
 
-4. Rode os scripts python dentro do Anaconda Prompt, certificando de rodar no mesmo ambiente onde foi instalado os requirements!!
+3. **Install Dependencies**: Run the following command in the root directory where `requirements.txt` is located:
+   ```bash
+   pip install -r requirements.txt
+   ```
